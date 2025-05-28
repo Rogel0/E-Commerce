@@ -3,7 +3,7 @@
     <el-row
       align="middle"
       justify="space-between"
-      style="width: 100%; padding-top: 30px; padding-right: 7%; padding-left: 7%"
+      style="width: 100%; padding-top: 20px; padding-right: 7%; padding-left: 7%"
     >
       <el-col :span="2" class="centered-col">
         <el-text class="logo-title">MatStore</el-text>
@@ -42,6 +42,17 @@ import { Avatar, HelpFilled, Location, ShoppingCart, Star } from '@element-plus/
 </script>
 
 <style scoped>
+.el-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: #fff;
+  box-shadow: 0 2px 8px 0 rgba(57, 185, 126, 0.08);
+  height: 30px;
+}
+
 .logo-title {
   color: #39b97e;
   font-weight: 800;
