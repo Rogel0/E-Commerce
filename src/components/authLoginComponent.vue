@@ -4,6 +4,7 @@
     @close="emit('update:visible', false)"
     align-center
     width="450"
+    height="600"
   >
     <el-tabs stretch>
       <el-tab-pane label="Password">
@@ -49,7 +50,55 @@
           </el-row>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="Phone Number"></el-tab-pane>
+      <el-tab-pane label="Phone Number">
+        <el-form style="padding-inline: 20px; padding-top: 10px; padding-bottom: 20px">
+          <el-form-item>
+            <el-input placeholder="Please enter your phone number" class="input" />
+          </el-form-item>
+
+          <el-row>
+            <el-col align="center" style="margin: 0 auto">
+              <el-button style="width: 100%" class="login-btn">Send code via SMS</el-button>
+              <el-button
+                style="
+                  width: 100%;
+                  margin-left: -1px;
+                  margin-top: 10px;
+                  background-color: none !important;
+                "
+                class="whatsapp-btn"
+                >Send code via Whatsapp</el-button
+              >
+            </el-col>
+            <el-col style="margin-top: 20px" align="center">
+              <el-text style="margin-top: 20px"
+                >Don't have an account? <span><a href="" class="signup">Sign up</a></span></el-text
+              >
+            </el-col>
+            <el-col style="padding-top: 40px" align="center">
+              <el-text>Or, login with</el-text>
+            </el-col>
+            <el-row style="width: 100%; margin-top: 20px">
+              <el-col :span="12" align="center">
+                <el-image
+                  :src="Google"
+                  alt="Google"
+                  style="width: 24px; vertical-align: middle; margin-right: 8px"
+                />
+                <el-text>Google</el-text>
+              </el-col>
+              <el-col :span="12" align="center">
+                <el-image
+                  :src="Facebook"
+                  alt="Facebook"
+                  style="width: 24px; vertical-align: middle; margin-right: 8px"
+                />
+                <el-text>Facebook</el-text>
+              </el-col>
+            </el-row>
+          </el-row>
+        </el-form>
+      </el-tab-pane>
     </el-tabs>
   </el-dialog>
 </template>
@@ -114,6 +163,15 @@ const emit = defineEmits(['update:visible'])
   font-size: 1.2em;
   font-weight: 600;
   border-radius: 10px;
+}
+
+.whatsapp-btn {
+  background-color: none;
+  height: 45px;
+  font-weight: 600;
+  border-radius: 10px;
+  border: 1px solid #f57224;
+  color: #f57224;
 }
 
 a {
