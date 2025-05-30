@@ -1,34 +1,50 @@
 <template>
-  <Header :onLoginClick="toggleLoginDialog" />
-  <AuthLoginComponent :model-value="isOpen" />
-  <el-container class="hero-section">
-    <el-row align="middle" justify="space-between" style="width: 100%">
-      <el-col class="centered-col">
-        <el-container class="left-hero">
-          <h4 style="font-size: 1em; color: #bec2c7">Starting at</h4>
-          <h1 style="font-size: 4em; width: 500px; font-weight: 800; line-height: 0.9">
-            The best Items Collection 2025
-          </h1>
-          <h3 style="font-family: var(--secondary-font)">
-            Exclusive offer <span style="color: yellow">-35%</span>off this week
-          </h3>
-          <el-button class="shop-now" style="font-weight: 700; padding: 20px; margin-top: 20px">
-            Shop Now
-            <el-icon style="margin-left: 8px"><ShoppingCart size="large" /></el-icon>
-          </el-button>
-        </el-container>
-        <el-container class="right-hero"> </el-container>
+  <el-header>
+    <el-row
+      align="middle"
+      justify="space-between"
+      style="width: 100%; padding-top: 25px; padding-right: 7%; padding-left: 7%"
+    >
+      <el-col :span="2" class="centered-col">
+        <el-text class="logo-title">MatStore</el-text>
+      </el-col>
+      <el-col :span="6" class="centered-col">
+        <el-input style="max-width: 600px" placeholder="Please input" class="input-with-select">
+          <template #prepend>
+            <el-select placeholder="All Categories" style="width: 140px" size="large">
+              <el-option label="Restaurant" value="1" />
+              <el-option label="Order No." value="2" />
+              <el-option label="Tel" value="3" />
+            </el-select>
+          </template>
+        </el-input>
+      </el-col>
+      <el-col :span="2" style="text-align: right" class="centered-col">
+        <el-select placeholder="Your Location" style="width: 180px" size="large" class="box-shadow">
+          <template #prefix>
+            <el-icon><Location /></el-icon>
+          </template>
+          <el-option>Phillipine</el-option>
+        </el-select>
+      </el-col>
+      <el-col :span="6" class="centered-col">
+        <el-button :icon="HelpFilled" text>Compare</el-button>
+        <el-badge :value="2"><el-button :icon="Star" text>Wishlist</el-button></el-badge>
+        <el-badge :value="12"><el-button :icon="ShoppingCart" text>Cart</el-button></el-badge>
+        <el-button :icon="Avatar" text @click="toggleLoginDialog">Account</el-button>
       </el-col>
     </el-row>
-  </el-container>
+  </el-header>
+  <AuthLoginComponent :model-value="isOpen" />
+  <HeroSectionComponent />
   <LandingPageProduct />
 </template>
 
 <script setup lang="ts">
 import AuthLoginComponent from '@/components/authLoginComponent.vue'
-import Header from '@/components/headerComponent.vue'
+import HeroSectionComponent from '@/components/heroSectionComponent.vue'
 import LandingPageProduct from '@/components/landingPageProduct.vue'
-import { ShoppingCart } from '@element-plus/icons-vue'
+import { Avatar, HelpFilled, Location, ShoppingCart, Star } from '@element-plus/icons-vue'
 import { ref } from 'vue'
 
 const isOpen = ref(false)
@@ -39,41 +55,39 @@ const toggleLoginDialog = () => {
 </script>
 
 <style scoped>
-.shop-now:hover {
-  scale: 1.1;
-  color: green;
+.el-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background: #fff;
+  height: 80px;
+}
+
+.logo-title {
+  color: #39b97e;
+  font-weight: 800;
+  font-size: 2em;
+}
+
+.input-with-select {
+  box-shadow: 2px 2px 8px 0 #39b97e33;
+}
+
+.box-shadow {
+  box-shadow:
+    0 2px 8px 0 rgba(57, 185, 126, 0.12),
+    0 1.5px 4px 0 rgba(40, 41, 40, 0.1);
+}
+
+:deep(.el-select__selected-item) {
+  color: #39b97e;
 }
 
 .centered-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  height: 100%;
-  width: 100%;
-}
-
-.left-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 5px;
-}
-
-.right-hero {
   display: flex;
   align-items: center;
-  justify-content: center;
-  height: 100%;
-}
-
-.hero-section {
-  background-color: #d9f1e7;
-  min-height: 400px;
-  margin-top: 80px;
-  padding-left: 20%;
-  padding-right: 20%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
 }
 </style>

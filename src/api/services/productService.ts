@@ -1,9 +1,28 @@
 import api from '@/api/api'
 import type { Product } from '@/model/types'
+import { ref } from 'vue'
 
-export const fetchProducts = async (): Promise<Product[]> => {
-  const res = await api.get<Product[]>('/products')
-  return res.data
+export function fetchProducts() {
+  const products = ref<Product[]>([])
+  const loading = ref(false)
+
+  const getProducts = async () => {
+    loading.value = true
+    try {
+      const res = await api.get<Product[]>('/products')
+      products.value = res.data
+    } catch (error) {
+      console.error('Failed to fetch products:', error)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  return {
+    products,
+    loading,
+    getProducts,
+  }
 }
 
 export const createProduct = async (data: Product): Promise<Product[]> => {
