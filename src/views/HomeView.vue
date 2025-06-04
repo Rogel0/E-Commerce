@@ -39,7 +39,7 @@
       <el-col :span="6" class="centered-col">
         <el-button :icon="HelpFilled" text>Compare</el-button>
         <el-badge :value="2"><el-button :icon="Star" text>Wishlist</el-button></el-badge>
-        <el-badge :value="12"
+        <el-badge :value="cartStore.getCartCount"
           ><el-button :icon="ShoppingCart" @click="toggleCartDrawer" text>Cart</el-button></el-badge
         >
         <el-dropdown v-if="userStore.token">
@@ -68,8 +68,10 @@ import { useUserStore } from '@/stores/useUserStore'
 import { ElLoading } from 'element-plus'
 import CartDrawerComponent from '@/components/cartDrawerComponent.vue'
 import { fetchProducts } from '@/api/services/productService'
+import { useCartStore } from '@/stores/useCartStore'
 
 const userStore = useUserStore()
+const cartStore = useCartStore()
 
 const isOpen = ref(false)
 const isOpenCart = ref(false)
