@@ -23,10 +23,12 @@ router.beforeEach((to, from, next) => {
   const userStore = useUserStore()
   const user = userStore.getUser
 
-  if (user && user.email === 'owner@gmail.com' && to.path === '/') {
-    next('/dashboard') 
+  if (to.path === '/dashboard' && (!user || user.email !== 'owner@gmail.com')) {
+    next('/')
+  } else if (user && user.email === 'owner@gmail.com' && to.path === '/') {
+    next('/dashboard')
   } else {
-    next() 
+    next()
   }
 })
 

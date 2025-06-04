@@ -1,39 +1,205 @@
 <template>
-  <div>
-    <h3>Manage Users</h3>
-    <form @submit.prevent="addUser">
-      <input v-model="newUser" placeholder="Enter user name" />
-      <button type="submit">Add User</button>
-    </form>
-    <el-table :data="users" style="width: 100%">
-      <el-table-column prop="name" label="User Name" width="200"></el-table-column>
-      <el-table-column label="Actions" width="200">
-        <template #default="{ row, $index }">
-          <button @click="removeUser($index)">Remove</button>
-        </template>
-      </el-table-column>
-    </el-table>
+  <div class="common-layout">
+    <el-container>
+      <el-aside
+        width="200px"
+        :style="{
+          backgroundColor: COLORS.primary,
+          height: '100vh',
+          borderRadius: '0 30px 30px 0',
+          padding: '10px',
+          position: 'relative',
+        }"
+      >
+        <!-- <div :style="{ display: 'flex', alignItems: 'center', marginBottom: '20px' }">
+          <el-image
+            :src="owner"
+            fit="cover"
+            :style="{ borderRadius: '99px', width: '50px', marginRight: '10px' }"
+          />
+          <el-text :style="{ fontFamily: 'bold', color: COLORS.secondary, fontSize: '20px' }">
+            Owner
+          </el-text>
+        </div> -->
 
-    <h3>Manage Products</h3>
-    <form @submit.prevent="addProduct">
-      <input v-model="newProduct.name" placeholder="Product Name" />
-      <input v-model="newProduct.price" placeholder="Product Price" type="number" />
-      <button type="submit">Add Product</button>
-    </form>
-    <el-table :data="products" style="width: 100%">
-      <el-table-column prop="name" label="Product Name" width="200"></el-table-column>
-      <el-table-column prop="price" label="Product Price" width="200"></el-table-column>
-      <el-table-column label="Actions" width="200">
-        <template #default="{ row, $index }">
-          <button @click="removeProduct($index)">Remove</button>
-          <button @click="editProduct($index)">Edit</button>
-        </template>
-      </el-table-column>
-    </el-table>
+        <div :style="{ display: 'flex', alignItems: 'center', gap: '10px' }">
+          <Shop :style="{ color: COLORS.secondary, height: '26px', width: '26px' }" />
+          <el-text :style="{ fontFamily: 'bold', color: COLORS.secondary, fontSize: '26px' }">
+            MatStore
+          </el-text>
+        </div>
 
-    <div style="margin-top: 20px; text-align: right">
-      <button @click="onLogout">Logout</button>
-    </div>
+        <div
+          :style="{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            marginTop: '10px',
+            backgroundColor: COLORS.secondary,
+            padding: '10px',
+            borderRadius: '10px',
+          }"
+        >
+          <div
+            :style="{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }"
+            @click="manageUsers"
+          >
+            <UserFilled :style="{ color: COLORS.primary, height: '16px', width: '16px' }" />
+            <el-text :style="{ fontFamily: 'bold', color: COLORS.primary, fontSize: '16px' }">
+              Users
+            </el-text>
+          </div>
+          <el-divider :style="{ margin: 0 }" />
+          <div
+            :style="{ display: 'flex', alignItems: 'center', gap: '10px', cursor: 'pointer' }"
+            @click="manageProducts"
+          >
+            <Menu :style="{ color: COLORS.primary, height: '16px', width: '16px' }" />
+            <el-text :style="{ fontFamily: 'bold', color: COLORS.primary, fontSize: '16px' }">
+              Products
+            </el-text>
+          </div>
+        </div>
+
+        <div
+          :style="{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            cursor: 'pointer',
+            position: 'absolute',
+            bottom: '20px',
+            left: '10px',
+          }"
+          @click="onLogout"
+        >
+          <ArrowLeftBold :style="{ color: COLORS.secondary, height: '16px', width: '16px' }" />
+          <el-text :style="{ fontFamily: 'bold', color: COLORS.secondary, fontSize: '16px' }">
+            Logout
+          </el-text>
+        </div>
+      </el-aside>
+      <el-container>
+        <el-header
+          :style="{
+            backgroundColor: COLORS.secondary,
+            margin: '10px',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }"
+        >
+          <el-text
+            v-if="manage === 'users'"
+            :style="{ fontFamily: 'bold', color: COLORS.primary, fontSize: '24px' }"
+          >
+            Manage Users
+          </el-text>
+
+          <el-text
+            v-if="manage === 'products'"
+            :style="{ fontFamily: 'bold', color: COLORS.primary, fontSize: '24px' }"
+          >
+            Manage Products
+          </el-text>
+        </el-header>
+        <el-main :style="{ backgroundColor: COLORS.primary, margin: '10px', borderRadius: '10px' }">
+          <div v-if="manage === 'users'">
+            <form @submit.prevent="addUser">
+              <input
+                v-model="newUser"
+                placeholder="New User Name"
+                :style="{
+                  border: '1px solid ' + COLORS.secondary,
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontFamily: 'regular',
+                }"
+              />
+              <button
+                type="submit"
+                :style="{
+                  backgroundColor: COLORS.secondary,
+                  color: COLORS.primary,
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '10px',
+                  cursor: 'pointer',
+                  fontFamily: 'bold',
+                }"
+              >
+                Add User
+              </button>
+            </form>
+            <el-table :data="users" style="width: 100%">
+              <el-table-column
+                prop="name"
+                label="User Name"
+                width="200"
+                :style="{ fontFamily: 'regular', color: COLORS.secondary }"
+              >
+              </el-table-column>
+              <el-table-column label="Actions" width="200">
+                <template #default="{ row, $index }">
+                  <button @click="removeUser($index)">Remove</button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+
+          <div v-else-if="manage === 'products'">
+            <form @submit.prevent="addProduct">
+              <input
+                v-model="newProduct.name"
+                placeholder="Product Name"
+                :style="{
+                  border: '1px solid ' + COLORS.secondary,
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontFamily: 'regular',
+                }"
+              />
+              <input
+                v-model="newProduct.price"
+                placeholder="Product Price"
+                type="number"
+                :style="{
+                  border: '1px solid ' + COLORS.secondary,
+                  borderRadius: '4px',
+                  padding: '8px',
+                  fontFamily: 'regular',
+                }"
+              />
+              <button
+                type="submit"
+                :style="{
+                  backgroundColor: COLORS.secondary,
+                  color: COLORS.primary,
+                  border: 'none',
+                  borderRadius: '4px',
+                  padding: '10px',
+                  cursor: 'pointer',
+                  fontFamily: 'bold',
+                }"
+              >
+                Add Product
+              </button>
+            </form>
+            <el-table :data="products" :style="{ width: '100%' }">
+              <el-table-column prop="name" label="Product Name" width="200"></el-table-column>
+              <el-table-column prop="price" label="Product Price" width="200"></el-table-column>
+              <el-table-column label="Actions" width="200">
+                <template #default="{ row, $index }">
+                  <button @click="removeProduct($index)">Remove</button>
+                  <button @click="editProduct($index)">Edit</button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </div>
+        </el-main>
+      </el-container>
+    </el-container>
   </div>
 </template>
 
@@ -42,13 +208,22 @@ import { ref, onMounted } from 'vue'
 import { ElLoading } from 'element-plus'
 import { useUserStore } from '@/stores/useUserStore'
 import { useRouter } from 'vue-router'
+import { COLORS } from '@/assets/theme'
 
 const userStore = useUserStore()
 const newUser = ref('')
-const users = ref<string[]>([])
+const users = ref<{ name: string }[]>([])
 const newProduct = ref({ name: '', price: 0 })
 const products = ref<{ name: string; price: number }[]>([])
+const manage = ref('users')
 const route = useRouter()
+
+const manageUsers = () => {
+  manage.value = 'users'
+}
+const manageProducts = () => {
+  manage.value = 'products'
+}
 
 onMounted(() => {
   const storedUsers = localStorage.getItem('users')
@@ -59,7 +234,7 @@ onMounted(() => {
 
 const addUser = () => {
   if (newUser.value.trim()) {
-    users.value.push(newUser.value)
+    users.value.push({ name: newUser.value })
     localStorage.setItem('users', JSON.stringify(users.value))
     newUser.value = ''
   }
@@ -102,7 +277,7 @@ const onLogout = () => {
   setTimeout(() => {
     loading.close()
     userStore.handleLogout()
-    route.push('/')
+    window.location.reload()
   }, 2000)
 }
 </script>
