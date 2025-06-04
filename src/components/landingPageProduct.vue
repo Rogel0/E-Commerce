@@ -16,7 +16,7 @@
         </el-card>
       </template>
       <template v-else>
-        <el-card v-for="product in products" :key="product.id">
+        <el-card v-for="product in filteredProducts" :key="product.id">
           <div class="image-container">
             <img class="product-image" :src="product.image" alt="" />
           </div>
@@ -30,7 +30,12 @@
               </div>
               <div class="bottom">
                 <h2 class="price">₱{{ product.price }}</h2>
-                <el-icon class="add"><ShoppingCart color="green" :size="20" /></el-icon>
+                <el-icon
+                  v-if="userStore.token"
+                  class="add"
+                  @click="handleAddToCart({ ...product, productId: product.id, quantity: 1 })"
+                  ><ShoppingCart color="green" :size="20"
+                /></el-icon>
               </div>
             </div>
           </template>
@@ -41,14 +46,49 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from 'vue'
+import { onMounted, computed } from 'vue'
 import { fetchProducts } from '@/api/services/productService'
+import { useCartStore } from '@/stores/useCartStore'
+import { useUserStore } from '@/stores/useUserStore'
+import { ElMessage } from 'element-plus'
+import { useRoute } from 'vue-router'
+import { useAttrs } from 'vue'
+
+const cartStore = useCartStore()
+const userStore = useUserStore()
 
 const { products, loading, getProducts } = fetchProducts()
+
+// Accept selectedCategory as a prop
+const props = defineProps<{ selectedCategory: string, search?: string }>()
+
+const filteredProducts = computed(() => {
+  let filtered = products.value
+  if (props.selectedCategory) {
+    filtered = filtered.filter(p => p.category === props.selectedCategory)
+  }
+  if (props.search) {
+    const searchLower = props.search.toLowerCase()
+    filtered = filtered.filter(p =>
+      p.title.toLowerCase().includes(searchLower) ||
+      p.category.toLowerCase().includes(searchLower)
+    )
+  }
+  return filtered
+})
 
 onMounted(async () => {
   await getProducts()
 })
+
+const handleAddToCart = (item: any) => {
+  const result = cartStore.addToCart(item)
+  if (result === 'added') {
+    ElMessage({ message: 'Item added to cart', type: 'success', duration: 2000 })
+  } else if (result === 'updated') {
+    ElMessage({ message: 'Item quantity updated in cart', type: 'success', duration: 2000 })
+  }
+}
 </script>
 
 <style scoped>
