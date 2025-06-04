@@ -140,8 +140,17 @@ import type { FormRules, FormInstance } from 'element-plus'
 import { ref } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import { ElMessage, ElLoading } from 'element-plus'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const userStore = useUserStore()
+
+const storeOwner = ref({
+  fullName: 'Store Owner',
+  email: 'owner@gmail.com',
+  phoneNumber: '09613835297',
+  password: 'owner123',
+})
 
 const loginForm = ref({
   phoneOrEmail: '',
@@ -226,6 +235,26 @@ const resetRegisterForm = () => {
 const onLogin = () => {
   loginFormRef.value?.validate((valid) => {
     if (!valid) return
+
+    if (
+      loginForm.value.phoneOrEmail === storeOwner.value.email &&
+      loginForm.value.password === storeOwner.value.password
+    ) {
+      const user = {
+        userId: Date.now(),
+        email: storeOwner.value.email,
+        phoneNumber: Number(storeOwner.value.phoneNumber),
+        fullName: storeOwner.value.fullName,
+        password: storeOwner.value.password,
+      }
+      const token = 'mock-token-store-owner-' + Date.now()
+      userStore.handleLogin(user, token)
+      emit('update:modelValue', false)
+      ElMessage.success('Store owner login successful!')
+      router.push('/dashboard')
+      return
+    }
+
     const storedUser = JSON.parse(localStorage.getItem('user') || 'null')
     if (!storedUser) {
       ElMessage.error('No registered user found. Please sign up first.')

@@ -30,6 +30,7 @@ export const useUserStore = defineStore('userStore', {
     handleLogout() {
       this.token = null
       localStorage.removeItem('token')
+      localStorage.removeItem('user')
     },
     handleRegister(user: Users) {
       this.user = user
