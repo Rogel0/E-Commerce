@@ -1,30 +1,42 @@
 <template>
   <el-dialog
     v-model="props.modelValue"
-    @close="emit('update:visible', false)"
+    @close="emit('update:modelValue', false)"
+    @closed="resetRegisterForm"
     align-center
     width="450"
     height="600"
   >
     <el-tabs stretch>
-      <el-tab-pane label="Password">
-        <el-form style="padding-inline: 20px; padding-top: 10px; padding-bottom: 20px">
-          <el-form-item>
-            <el-input placeholder="Please enter your Phone or Email" class="input" />
+      <el-tab-pane label="Login">
+        <el-form
+          :model="loginForm"
+          :rules="loginRules"
+          ref="loginFormRef"
+          style="padding-inline: 20px; padding-top: 10px; padding-bottom: 20px"
+        >
+          <el-form-item prop="phoneOrEmail">
+            <el-input
+              v-model="loginForm.phoneOrEmail"
+              placeholder="Please enter your Phone or Email"
+              class="input"
+            />
           </el-form-item>
-          <el-form-item>
-            <el-input placeholder="Please enter your password" class="input" show-password />
+          <el-form-item prop="password">
+            <el-input
+              v-model="loginForm.password"
+              placeholder="Please enter your password"
+              class="input"
+              show-password
+            />
+          </el-form-item>
+          <el-col align="end" style="padding-bottom: 20px">
             <el-text style="width: 100%; text-align: end"><a href="">Forgot Password?</a></el-text>
-          </el-form-item>
+          </el-col>
 
           <el-row>
             <el-col align="center">
-              <el-button style="width: 100%" class="login-btn">Login</el-button>
-            </el-col>
-            <el-col style="margin-top: 20px" align="center">
-              <el-text style="margin-top: 20px"
-                >Don't have an account? <span><a href="" class="signup">Sign up</a></span></el-text
-              >
+              <el-button style="width: 100%" class="login-btn" @click="onLogin">Login</el-button>
             </el-col>
             <el-col style="padding-top: 40px" align="center">
               <el-text>Or, login with</el-text>
@@ -50,31 +62,49 @@
           </el-row>
         </el-form>
       </el-tab-pane>
-      <el-tab-pane label="Phone Number">
-        <el-form style="padding-inline: 20px; padding-top: 10px; padding-bottom: 20px">
-          <el-form-item>
-            <el-input placeholder="Please enter your phone number" class="input" />
+      <el-tab-pane label="Signup">
+        <el-form
+          :model="registerForm"
+          :rules="rules"
+          ref="registerFormRef"
+          style="padding-inline: 20px; padding-top: 10px; padding-bottom: 20px"
+        >
+          <el-form-item prop="fullName">
+            <el-input
+              v-model="registerForm.fullName"
+              placeholder="Please enter your Full Name"
+              class="input"
+            />
           </el-form-item>
-
+          <el-form-item prop="email">
+            <el-input
+              v-model="registerForm.email"
+              placeholder="Please enter your Email Address"
+              class="input"
+            />
+          </el-form-item>
+          <el-form-item prop="phoneNumber">
+            <el-input
+              v-model="registerForm.phoneNumber"
+              placeholder="Please enter your Phone Number"
+              class="input"
+            />
+          </el-form-item>
+          <el-form-item prop="password">
+            <el-input
+              v-model="registerForm.password"
+              placeholder="Please enter your Password"
+              class="input"
+              show-password
+            />
+          </el-form-item>
           <el-row>
-            <el-col align="center" style="margin: 0 auto">
-              <el-button style="width: 100%" class="login-btn">Send code via SMS</el-button>
-              <el-button
-                style="
-                  width: 100%;
-                  margin-left: -1px;
-                  margin-top: 10px;
-                  background-color: none !important;
-                "
-                class="whatsapp-btn"
-                >Send code via Whatsapp</el-button
+            <el-col align="center">
+              <el-button style="width: 100%" class="login-btn" @click="onRegister"
+                >Register</el-button
               >
             </el-col>
-            <el-col style="margin-top: 20px" align="center">
-              <el-text style="margin-top: 20px"
-                >Don't have an account? <span><a href="" class="signup">Sign up</a></span></el-text
-              >
-            </el-col>
+
             <el-col style="padding-top: 40px" align="center">
               <el-text>Or, login with</el-text>
             </el-col>
@@ -106,10 +136,129 @@
 <script setup lang="ts">
 import Google from '@/assets/svg/google.svg'
 import Facebook from '@/assets/svg/facebook.svg'
+import type { FormRules, FormInstance } from 'element-plus'
+import { ref } from 'vue'
+import { useUserStore } from '@/stores/useUserStore'
+import { ElMessage, ElLoading } from 'element-plus'
+
+const userStore = useUserStore()
+
+const loginForm = ref({
+  phoneOrEmail: '',
+  password: '',
+})
+
+const registerForm = ref({
+  fullName: '',
+  email: '',
+  phoneNumber: '',
+  password: '',
+})
+
+const registerFormRef = ref<FormInstance>()
+const loginFormRef = ref<FormInstance>()
+
+const rules = ref<FormRules>({
+  fullName: [
+    { required: true, message: 'Full Name is required', trigger: 'blur' },
+    { min: 3, message: 'Full Name must be at least 3 characters', trigger: 'blur' },
+  ],
+  email: [
+    { required: true, message: 'Email is required', trigger: 'blur' },
+    { type: 'email', message: 'Email must be valid', trigger: ['blur', 'change'] },
+  ],
+  phoneNumber: [
+    { required: true, message: 'Phone Number is required', trigger: 'blur' },
+    { pattern: /^\d{10,15}$/, message: 'Phone Number must be 10-15 digits', trigger: 'blur' },
+  ],
+  password: [
+    { required: true, message: 'Password is required', trigger: 'blur' },
+    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' },
+  ],
+})
+
+const loginRules = ref<FormRules>({
+  phoneOrEmail: [
+    { required: true, message: 'Phone or Email is required', trigger: 'blur' },
+    { min: 3, message: 'Must be at least 3 characters', trigger: 'blur' },
+  ],
+  password: [
+    { required: true, message: 'Password is required', trigger: 'blur' },
+    { min: 6, message: 'Password must be at least 6 characters', trigger: 'blur' },
+  ],
+})
+
+const onRegister = () => {
+  registerFormRef.value?.validate((valid) => {
+    const loading = ElLoading.service({
+      lock: true,
+      text: 'Registering...',
+      background: 'rgba(0, 0, 0, 0.7)',
+    })
+    setTimeout(() => {
+      loading.close()
+    }, 2000)
+    setTimeout(() => {
+      if (!valid) return
+      const user = {
+        userId: Date.now(),
+        email: registerForm.value.email,
+        phoneNumber: Number(registerForm.value.phoneNumber),
+        fullName: registerForm.value.fullName,
+        password: registerForm.value.password,
+      }
+
+      userStore.handleRegister(user)
+      emit('update:modelValue', false)
+      ElMessage.success('Registration successful! You can now log in.')
+      resetRegisterForm()
+    }, 2000)
+  })
+}
+
+const resetRegisterForm = () => {
+  registerForm.value.email = ''
+  registerForm.value.phoneNumber = ''
+  registerForm.value.fullName = ''
+  registerForm.value.password = ''
+}
+
+const onLogin = () => {
+  loginFormRef.value?.validate((valid) => {
+    if (!valid) return
+    const storedUser = JSON.parse(localStorage.getItem('user') || 'null')
+    if (!storedUser) {
+      ElMessage.error('No registered user found. Please sign up first.')
+      return
+    }
+    const isEmail = loginForm.value.phoneOrEmail.includes('@')
+    const isMatch =
+      ((isEmail && loginForm.value.phoneOrEmail === storedUser.email) ||
+        (!isEmail && Number(loginForm.value.phoneOrEmail) === storedUser.phoneNumber)) &&
+      loginForm.value.password === storedUser.password
+    if (!isMatch) {
+      ElMessage.error('Invalid credentials. Please try again.')
+      return
+    }
+    // Credentials correct, log in
+    const user = {
+      userId: storedUser.userId,
+      email: storedUser.email,
+      phoneNumber: storedUser.phoneNumber,
+      fullName: storedUser.fullName,
+      password: storedUser.password,
+    }
+    const token = 'mock-token-' + Date.now()
+    userStore.handleLogin(user, token)
+    emit('update:modelValue', false)
+    ElMessage.success('Login successful!')
+  })
+}
+
 const props = defineProps<{
   modelValue: boolean
 }>()
-const emit = defineEmits(['update:visible'])
+const emit = defineEmits(['update:modelValue'])
 </script>
 
 <style scoped>

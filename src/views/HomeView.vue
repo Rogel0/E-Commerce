@@ -9,12 +9,21 @@
         <el-text class="logo-title">MatStore</el-text>
       </el-col>
       <el-col :span="6" class="centered-col">
-        <el-input style="max-width: 600px" placeholder="Please input" class="input-with-select">
+        <el-input
+          v-model="searchInput"
+          style="max-width: 600px"
+          placeholder="Please input"
+          class="input-with-select"
+        >
           <template #prepend>
-            <el-select placeholder="All Categories" style="width: 140px" size="large">
-              <el-option label="Restaurant" value="1" />
-              <el-option label="Order No." value="2" />
-              <el-option label="Tel" value="3" />
+            <el-select
+              v-model="selectedCategory"
+              placeholder="All Categories"
+              style="width: 140px"
+              size="large"
+            >
+              <el-option label="All Categories" value="" />
+              <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat" />
             </el-select>
           </template>
         </el-input>
@@ -24,20 +33,29 @@
           <template #prefix>
             <el-icon><Location /></el-icon>
           </template>
-          <el-option>Phillipine</el-option>
+          <el-option prop="ph" value="ph">Phillipine</el-option>
         </el-select>
       </el-col>
       <el-col :span="6" class="centered-col">
         <el-button :icon="HelpFilled" text>Compare</el-button>
         <el-badge :value="2"><el-button :icon="Star" text>Wishlist</el-button></el-badge>
-        <el-badge :value="12"><el-button :icon="ShoppingCart" text>Cart</el-button></el-badge>
-        <el-button :icon="Avatar" text @click="toggleLoginDialog">Account</el-button>
+        <el-badge :value="cartStore.getCartCount"
+          ><el-button :icon="ShoppingCart" @click="toggleCartDrawer" text>Cart</el-button></el-badge
+        >
+        <el-dropdown v-if="userStore.token">
+          <el-button :icon="Avatar" text>Account</el-button>
+          <template #dropdown>
+            <el-dropdown-item @click="onLogout"> Logout </el-dropdown-item>
+          </template>
+        </el-dropdown>
+        <el-button v-else :icon="Avatar" text @click="toggleLoginDialog">Login</el-button>
       </el-col>
     </el-row>
   </el-header>
-  <AuthLoginComponent :model-value="isOpen" />
+  <CartDrawerComponent v-model:modelValue="isOpenCart" />
+  <AuthLoginComponent v-model:modelValue="isOpen" />
   <HeroSectionComponent />
-  <LandingPageProduct />
+  <LandingPageProduct :selectedCategory="selectedCategory" :search="debouncedSearch" />
 </template>
 
 <script setup lang="ts">
@@ -45,13 +63,63 @@ import AuthLoginComponent from '@/components/authLoginComponent.vue'
 import HeroSectionComponent from '@/components/heroSectionComponent.vue'
 import LandingPageProduct from '@/components/landingPageProduct.vue'
 import { Avatar, HelpFilled, Location, ShoppingCart, Star } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useUserStore } from '@/stores/useUserStore'
+import { ElLoading } from 'element-plus'
+import CartDrawerComponent from '@/components/cartDrawerComponent.vue'
+import { fetchProducts } from '@/api/services/productService'
+import { useCartStore } from '@/stores/useCartStore'
+
+const userStore = useUserStore()
+const cartStore = useCartStore()
 
 const isOpen = ref(false)
+const isOpenCart = ref(false)
+const selectedCategory = ref('')
+
+const toggleCartDrawer = () => {
+  isOpenCart.value = !isOpenCart.value
+}
 
 const toggleLoginDialog = () => {
   isOpen.value = !isOpen.value
 }
+
+const onLogout = () => {
+  const loading = ElLoading.service({
+    lock: true,
+    text: 'Registering...',
+    background: 'rgba(0, 0, 0, 0.7)',
+  })
+  setTimeout(() => {
+    loading.close()
+  }, 2000)
+  setTimeout(() => {
+    userStore.handleLogout()
+  }, 2000)
+}
+
+// Dynamic category dropdown logic
+const { products, getProducts } = fetchProducts()
+const categories = computed(() => {
+  const set = new Set<string>()
+  products.value.forEach((p) => set.add(p.category))
+  return Array.from(set)
+})
+onMounted(() => {
+  getProducts()
+})
+
+const searchInput = ref('')
+const debouncedSearch = ref('')
+let searchTimeout: ReturnType<typeof setTimeout> | null = null
+
+watch(searchInput, (val) => {
+  if (searchTimeout) clearTimeout(searchTimeout)
+  searchTimeout = setTimeout(() => {
+    debouncedSearch.value = val
+  }, 400)
+})
 </script>
 
 <style scoped>
