@@ -1,8 +1,7 @@
 <template>
   <el-dialog
-    v-model="props.modelValue"
-    @close="emit('update:modelValue', false)"
-    @closed="resetRegisterForm"
+    v-model="uiState.loginDialogOpen"
+    @close="uiState.loginDialogOpen = false"
     align-center
     width="450"
     height="600"
@@ -141,6 +140,9 @@ import { ref } from 'vue'
 import { useUserStore } from '@/stores/useUserStore'
 import { ElMessage, ElLoading } from 'element-plus'
 import { useRouter } from 'vue-router'
+import { useUiStateStore } from '@/stores/useUiStateStore'
+
+const uiState = useUiStateStore()
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -218,7 +220,7 @@ const onRegister = () => {
       }
 
       userStore.handleRegister(user)
-      emit('update:modelValue', false)
+      uiState.loginDialogOpen = false
       ElMessage.success('Registration successful! You can now log in.')
       resetRegisterForm()
     }, 2000)
@@ -249,7 +251,7 @@ const onLogin = () => {
       }
       const token = 'mock-token-store-owner-' + Date.now()
       userStore.handleLogin(user, token)
-      emit('update:modelValue', false)
+      uiState.loginDialogOpen = false
       ElMessage.success('Store owner login successful!')
       router.push('/dashboard')
       return
@@ -279,15 +281,10 @@ const onLogin = () => {
     }
     const token = 'mock-token-' + Date.now()
     userStore.handleLogin(user, token)
-    emit('update:modelValue', false)
+    uiState.loginDialogOpen = false
     ElMessage.success('Login successful!')
   })
 }
-
-const props = defineProps<{
-  modelValue: boolean
-}>()
-const emit = defineEmits(['update:modelValue'])
 </script>
 
 <style scoped>

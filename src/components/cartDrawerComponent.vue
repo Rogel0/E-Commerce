@@ -1,8 +1,8 @@
 <template>
   <el-drawer
     :size="500"
-    v-model="props.modelValue"
-    @close="emit('update:modelValue', false)"
+    v-model="uiState.cartDrawerOpen"
+    @close="uiState.cartDrawerOpen = false"
     title="Cart"
   >
     <template v-if="cartItems.length === 0">
@@ -104,10 +104,13 @@
 import { computed } from 'vue'
 import { useCartStore } from '@/stores/useCartStore'
 import { Plus, Minus, Delete } from '@element-plus/icons-vue'
+import { useUiStateStore } from '@/stores/useUiStateStore'
 
-const props = defineProps<{
-  modelValue: boolean
-}>()
+const uiState = useUiStateStore()
+
+// const props = defineProps<{
+//   modelValue: boolean
+// }>()
 
 const emit = defineEmits(['update:modelValue'])
 

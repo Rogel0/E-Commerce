@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import Dashboard from '@/views/Dashboard.vue'
+import ViewProduct from '@/views/ProductView.vue'
 import { useUserStore } from '@/stores/useUserStore'
 
 const router = createRouter({
@@ -15,6 +16,11 @@ const router = createRouter({
       path: '/dashboard',
       name: 'dashboard',
       component: Dashboard,
+    },
+    {
+      path: '/productDetails/:id',
+      name: 'productDetails',
+      component: ViewProduct,
     },
   ],
 })

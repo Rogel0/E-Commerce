@@ -17,7 +17,7 @@
       </template>
       <template v-else>
         <el-card v-for="product in filteredProducts" :key="product.id">
-          <div class="image-container">
+          <div class="image-container" @click="handleViewItem(product.id)">
             <img class="product-image" :src="product.image" alt="" />
           </div>
           <template #footer>
@@ -51,8 +51,9 @@ import { fetchProducts } from '@/api/services/productService'
 import { useCartStore } from '@/stores/useCartStore'
 import { useUserStore } from '@/stores/useUserStore'
 import { ElMessage } from 'element-plus'
-import { useRoute } from 'vue-router'
-import { useAttrs } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const cartStore = useCartStore()
 const userStore = useUserStore()
@@ -60,18 +61,19 @@ const userStore = useUserStore()
 const { products, loading, getProducts } = fetchProducts()
 
 // Accept selectedCategory as a prop
-const props = defineProps<{ selectedCategory: string, search?: string }>()
+const props = defineProps<{ selectedCategory: string; search?: string }>()
 
 const filteredProducts = computed(() => {
   let filtered = products.value
   if (props.selectedCategory) {
-    filtered = filtered.filter(p => p.category === props.selectedCategory)
+    filtered = filtered.filter((p) => p.category === props.selectedCategory)
   }
   if (props.search) {
     const searchLower = props.search.toLowerCase()
-    filtered = filtered.filter(p =>
-      p.title.toLowerCase().includes(searchLower) ||
-      p.category.toLowerCase().includes(searchLower)
+    filtered = filtered.filter(
+      (p) =>
+        p.title.toLowerCase().includes(searchLower) ||
+        p.category.toLowerCase().includes(searchLower),
     )
   }
   return filtered
@@ -88,6 +90,10 @@ const handleAddToCart = (item: any) => {
   } else if (result === 'updated') {
     ElMessage({ message: 'Item quantity updated in cart', type: 'success', duration: 2000 })
   }
+}
+
+const handleViewItem = (id: number) => {
+  router.push({ name: 'productDetails', params: { id } })
 }
 </script>
 
@@ -106,6 +112,12 @@ const handleAddToCart = (item: any) => {
   justify-content: center;
   margin: 0 auto;
   overflow: hidden;
+}
+
+.image-container:hover {
+  cursor: pointer;
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
 }
 
 .product-image {

@@ -25,6 +25,24 @@ export function fetchProducts() {
   }
 }
 
+export const fetchProductById = () => {
+  const product = ref<Product | null>(null)
+
+  const getProductById = async (id: number) => {
+    try {
+      const res = await api.get<Product>(`/products/${id}`)
+      product.value = res.data
+    } catch (error) {
+      console.error('Failed to fetch product by ID:', error)
+    }
+  }
+
+  return {
+    product,
+    getProductById,
+  }
+}
+
 export const createProduct = async (data: Product): Promise<Product[]> => {
   const res = await api.post('/products', data)
   return res.data
